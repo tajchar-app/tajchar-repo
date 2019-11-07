@@ -35,6 +35,7 @@ library(googlesheets)
 shinyServer(function(input, output, session) {
   
   
+  IP <- reactive({ input$getIP })
   # # Questionnaire ----------------------------------------------------------------
   # 
   # # Create an empty vector to hold survey results
@@ -297,7 +298,7 @@ shinyServer(function(input, output, session) {
            "infoHist" =  selectInput("typInfo", "História:", choices = infoList$infoHist),
            "infoTech" = selectInput("typInfo", "Technické parametre:", choices = infoList$infoTech),
            "infoDnes" =   selectInput("typInfo", "Súčasné informácie:", choices = infoList$infoDnes),
-      "xxx" =   selectInput("typInfo", "Názorové mapy:", choices = infoList$nazory))
+      "xxx" =   selectInput("typInfo", "Názorové mapy:", choices = infoList$xxx))
       
   })
   
@@ -388,15 +389,15 @@ shinyServer(function(input, output, session) {
   
   # XXX
   pal.oblubenost <-
-    colorNumeric(palette = "YlGnBu", domain = dtTajchy$oblubenostNnum)
+    colorNumeric(palette = "YlGnBu", domain = dtTajchy$oblubenost.num)
   pal.vybava <-
-    colorNumeric(palette = "YlGnBu", domain = dtTajchy$vybavaNum)
+    colorNumeric(palette = "YlGnBu", domain = dtTajchy$vybava.num)
   pal.topbufet <-
-    colorNumeric(palette = "YlGnBu", domain = dtTajchy$bufetNum)
+    colorNumeric(palette = "YlGnBu", domain = dtTajchy$bufet.num)
   pal.teplota <-
-    colorNumeric(palette = "PuRd", domain = dtTajchy$teplotaNum)
+    colorNumeric(palette = "PuRd", domain = dtTajchy$teplota.num)
   pal.smeti <-
-    colorNumeric(palette = "PuRd", domain = dtTajchy$smetiNum)
+    colorNumeric(palette = "PuRd", domain = dtTajchy$smeti.num)
   
   
   # LEAFLET -----------------------------------------------------------------
@@ -526,6 +527,18 @@ shinyServer(function(input, output, session) {
                                 "padding" = "2px 5px 2px 5px"
                               ))
     
+    labOptIdeaTajch <-labelOptions(noHide = vypinacPopis(), direction = "left", offset=c(1,-37),
+                                   style = list(
+                                     "background-color"= "rgba(0, 199, 181, 0.55)",
+                                     "color" = "#fff",
+                                     "font-family" = "Exo 2",
+                                     "font-style" = "bold",
+                                     "box-shadow" = "3px 3px rgba(0,0,0,0.25)",
+                                     "font-size" = "1.1em",
+                                     "border-color" = "rgba(0,0,0,0.5)",
+                                     "border-radius" = "35px",
+                                     "padding" = "2px 5px 2px 5px"
+                                   ))
     
     # TYPINFO -----------------------------------------------------------------
     typInfo = input$typInfo
@@ -552,7 +565,7 @@ if('vznik' %in% typInfo ) {
 }
 
 
-if('oblubenostNum' %in% typInfo |'vybavaNum' %in% typInfo |'bufetNum' %in% typInfo |'teplotaNum' %in% typInfo |'smetiNum' %in% typInfo){
+if('oblubenost.num' %in% typInfo |'vybava.num' %in% typInfo |'bufet.num' %in% typInfo |'teplota.num' %in% typInfo |'smeti.num' %in% typInfo){
   jednotka <- "x"
 }
 # bar plot ----------------------------------------------------------------
@@ -1372,7 +1385,7 @@ if ('skupina' %in% typInfo |'matHradze' %in% typInfo |'stavitel' %in% typInfo |'
       
       
       # X_Oblubenost ----------------------------------------------------------------
-      if ('Najobľúbenejší tajch' %in% typInfo) {
+      if ('oblubenostNum' %in% typInfo) {
         
         map %>% clearShapes() %>%
           clearControls() %>%
@@ -1380,8 +1393,8 @@ if ('skupina' %in% typInfo |'matHradze' %in% typInfo |'stavitel' %in% typInfo |'
         
         leafletProxy("map")  %>%  addPolygons(
           data = shp_selected(),
-          label = as.character(shp_selected()$oblubenostNum),
-          color = ~pal.oblubenost(oblubenostNum),
+          label = as.character(shp_selected()$oblubenost.num),
+          color = ~pal.oblubenost(oblubenost.num),
           
           labelOptions = labOptTech,
           options = polyOptions
@@ -1389,7 +1402,7 @@ if ('skupina' %in% typInfo |'matHradze' %in% typInfo |'stavitel' %in% typInfo |'
         
         if (vypinacLegenda() == TRUE) {
           
-          map %>%  addLegend("bottomright", pal = pal.oblubenost, values = shp_selected()$oblubenostNum,
+          map %>%  addLegend("bottomright", pal = pal.oblubenost, values = shp_selected()$oblubenost.num,
             title = "Najobľubenejší tajch:",
             opacity = 1)
         }}
@@ -1398,7 +1411,7 @@ if ('skupina' %in% typInfo |'matHradze' %in% typInfo |'stavitel' %in% typInfo |'
       # X_Vybava ------------------------------------------------------------------
       
       
-      if ('Najlepšie vybavenie' %in% typInfo) {
+      if ('vybava.num' %in% typInfo) {
         
         map %>% clearShapes() %>%
           clearControls() %>%
@@ -1406,8 +1419,8 @@ if ('skupina' %in% typInfo |'matHradze' %in% typInfo |'stavitel' %in% typInfo |'
         
         leafletProxy("map")  %>%  addPolygons(
           data = shp_selected(),
-          label = as.character(shp_selected()$vybavaNum),
-          color = ~pal.vybava(vybavaNum),
+          label = as.character(shp_selected()$vybava.num),
+          color = ~pal.vybava(vybava.num),
           
           labelOptions = labOptTech,
           options = polyOptions
@@ -1415,7 +1428,7 @@ if ('skupina' %in% typInfo |'matHradze' %in% typInfo |'stavitel' %in% typInfo |'
         
         if (vypinacLegenda() == TRUE) {
           
-          map %>%  addLegend("bottomright", pal = pal.vybava, values = shp_selected()$vybavaNum,
+          map %>%  addLegend("bottomright", pal = pal.vybava, values = shp_selected()$vybava.num,
             title = "Najlepšie vybavenie:",
             opacity = 1)
         }}
@@ -1424,7 +1437,7 @@ if ('skupina' %in% typInfo |'matHradze' %in% typInfo |'stavitel' %in% typInfo |'
       # X_najlepsi bufet ----------------------------------------------------------
       
       
-      if ('Najlepší bufet' %in% typInfo) {
+      if ('bufet.num' %in% typInfo) {
         
         map %>% clearShapes() %>%
           clearControls() %>%
@@ -1432,8 +1445,8 @@ if ('skupina' %in% typInfo |'matHradze' %in% typInfo |'stavitel' %in% typInfo |'
         
         leafletProxy("map")  %>%  addPolygons(
           data = shp_selected(),
-          label = as.character(shp_selected()$bufetNum),
-          color = ~pal.topbufet(bufetNum),
+          label = as.character(shp_selected()$bufet.num),
+          color = ~pal.topbufet(bufet.num),
           
           labelOptions = labOptTech,
           options = polyOptions
@@ -1441,7 +1454,7 @@ if ('skupina' %in% typInfo |'matHradze' %in% typInfo |'stavitel' %in% typInfo |'
         
         if (vypinacLegenda() == TRUE) {
           
-          map %>%  addLegend("bottomright", pal = pal.topbufet, values = shp_selected()$bufetNum,
+          map %>%  addLegend("bottomright", pal = pal.topbufet, values = shp_selected()$bufet.num,
             title = "Najlepší bufet:",
             opacity = 1)
         }}
@@ -1450,7 +1463,7 @@ if ('skupina' %in% typInfo |'matHradze' %in% typInfo |'stavitel' %in% typInfo |'
       # X_najteplejsia voda -------------------------------------------------------
       
       
-      if ('Najteplejšia voda' %in% typInfo) {
+      if ('teplota.num' %in% typInfo) {
         
         map %>% clearShapes() %>%
           clearControls() %>%
@@ -1458,8 +1471,8 @@ if ('skupina' %in% typInfo |'matHradze' %in% typInfo |'stavitel' %in% typInfo |'
         
         leafletProxy("map")  %>%  addPolygons(
           data = shp_selected(),
-          label = as.character(shp_selected()$teplotaNum),
-          color = ~pal.teplota(teplotaNum),
+          label = as.character(shp_selected()$teplota.num),
+          color = ~pal.teplota(teplota.num),
           
           labelOptions = labOptTech,
           options = polyOptions
@@ -1467,7 +1480,7 @@ if ('skupina' %in% typInfo |'matHradze' %in% typInfo |'stavitel' %in% typInfo |'
         
         if (vypinacLegenda() == TRUE) {
           
-          map %>%  addLegend("bottomright", pal = pal.teplota, values = shp_selected()$teplotaNum,
+          map %>%  addLegend("bottomright", pal = pal.teplota, values = shp_selected()$teplota.num,
             title = "Najteplejšia voda:",
             opacity = 1)
         }}
@@ -1475,7 +1488,7 @@ if ('skupina' %in% typInfo |'matHradze' %in% typInfo |'stavitel' %in% typInfo |'
       
       # X_znecistene okolie -------------------------------------------------------
       
-      if ('Znečistené okolie' %in% typInfo) {
+      if ('smeti.num' %in% typInfo) {
         
         map %>% clearShapes() %>%
           clearControls() %>%
@@ -1483,8 +1496,8 @@ if ('skupina' %in% typInfo |'matHradze' %in% typInfo |'stavitel' %in% typInfo |'
         
         leafletProxy("map")  %>%  addPolygons(
           data = shp_selected(),
-          label = as.character(shp_selected()$smetiNum),
-          color = ~pal.smeti(smetiNum),
+          label = as.character(shp_selected()$smeti.num),
+          color = ~pal.smeti(smeti.num),
           
           labelOptions = labOptTech,
           options = polyOptions
@@ -1492,10 +1505,12 @@ if ('skupina' %in% typInfo |'matHradze' %in% typInfo |'stavitel' %in% typInfo |'
         
         if (vypinacLegenda() == TRUE) {
           
-          map %>%  addLegend("bottomright", pal = pal.smeti, values = shp_selected()$smetiNum,
+          map %>%  addLegend("bottomright", pal = pal.smeti, values = shp_selected()$smeti.num,
             title = "Znečistené okolie:",
             opacity = 1)
         }}
+      
+      
       
       
     } # end: typinfo
@@ -1561,16 +1576,44 @@ if ('skupina' %in% typInfo |'matHradze' %in% typInfo |'stavitel' %in% typInfo |'
       }
       
       
+      # if ('shpTajchyIdea' %in% shpSelect) {
+      #   leafletProxy("map")  %>% addPolygons(
+      #     data = shpTajchyIdea,
+      #     fillColor= "green",
+      #     fillOpacity = 0.4,
+      #     weight = 0.2,
+      #     smoothFactor = 0.2,
+      #     highlightOptions = highlightOptions(color = "orange", weight = 2,
+      #                                         bringToFront = TRUE))
+      # }
       if ('shpTajchyIdea' %in% shpSelect) {
-        leafletProxy("map")  %>% addPolygons(
-          data = shpTajchyIdea,
-          fillColor= "green",
-          fillOpacity = 0.4,
-          weight = 0.2,
-          smoothFactor = 0.2,
-          highlightOptions = highlightOptions(color = "orange", weight = 2,
-                                              bringToFront = TRUE))
+        leafletProxy("map")  %>%
+          clearControls() %>%
+          clearMarkers() %>% 
+          clearPopups() %>% 
+          
+          addPolygons(
+            data = shpTajchyIdea,
+            label = shpTajchyIdea$meno,
+            labelOptions = labOptIdeaTajch,
+            fillColor= "rgba(0, 199, 181, 0.90)",
+            fillOpacity = 0.4,
+            weight = 0.2,
+            smoothFactor = 0.2,
+            highlightOptions = highlightOptions(color = "white", weight = 2,
+                                                bringToFront = TRUE))
+        
+        if (vypinacLegenda() == TRUE) {
+          map %>%  addLegend(
+            position = 'bottomright',
+            colors = "red",
+            labels = "Plánované priargské tajchy (Zdroj: doplnit)", opacity = 1,
+            title = 'Legenda:'
+          )
+        }
       }
+      
+      
     }
   })
 })

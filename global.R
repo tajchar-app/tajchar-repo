@@ -100,9 +100,9 @@ for (shp in shps) assign(shp, readOGR(".", shp, dropNULLGeometries=TRUE, encodin
 # set CRS
 shpTajchy <- spTransform(shpTajchy, CRS("+proj=longlat +datum=WGS84 +no_defs"))
 shpTajchyHist <- spTransform(shpTajchyHist, CRS("+proj=longlat +datum=WGS84 +no_defs"))
-# shpTajchyIdea <- spTransform(shpTajchyIdea, CRS("+proj=longlat +datum=WGS84 +no_defs"))
+shpTajchyIdea <- spTransform(shpTajchyIdea_wgs84, CRS("+proj=longlat +datum=WGS84 +no_defs"))
 shpJarky <- spTransform(shpJarky, CRS("+proj=longlat +datum=WGS84 +no_defs"))
-# shpStolneVodne <- spTransform(shpStolneVodne, CRS("+proj=longlat +datum=WGS84 +no_defs"))
+shpStolneVodne <- spTransform(shpStolneVodne, CRS("+proj=longlat +datum=WGS84 +no_defs"))
 # shpStolne <- spTransform(shpStolne, CRS("+proj=longlat +datum=WGS84 +no_defs"))
 # shpPingy <- spTransform(shpPingy, CRS("+proj=longlat +datum=WGS84 +no_defs"))
 
@@ -124,9 +124,52 @@ dtTajchy$y <- round(dtTajchy$y, 3)
 
 pikosky <- read_excel("pikosky.xlsx", col_names = FALSE)
 
-# dtTajchy$objemM3 <-  varhandle::unfactor(dtTajchy$objemM3)
-# dtTajchy$dlzkaZbJrk <-  varhandle::unfactor(dtTajchy$dlzkaZbJrk)
-# dtTajchy$dlzkaStoln <-  varhandle::unfactor(dtTajchy$dlzkaStoln)
+
+
+# XXX ---------------------------------------------------------------------
+# doplnim do shpTajchy stlpce s aktualizovanymi udajmi z dotaznika
+if("dfXXX" %in% ls()) rm(dfXXX)
+dfXXX <- dtTajchy[,1]
+
+
+# DFXXX -------------------------------------------------------------------
+
+# zistim vyskyty jednotlivych tajchov
+sumOblubenost <- df.presults %>% 
+  group_by(oblubenost) %>%
+  dplyr::summarise(oblubenost.num = length(oblubenost))
+
+sumVybava <- df.presults %>% 
+  dplyr::group_by(vybava) %>%
+  dplyr::summarise(vybava.num = length(vybava))
+
+sumBufet <- df.presults %>% 
+  group_by(bufet) %>%
+  dplyr::summarise(bufet.num = length(bufet))
+
+sumTeplota <- df.presults %>% 
+  group_by(teplota) %>%
+  dplyr::summarise(teplota.num = length(teplota))
+
+sumSmeti <- df.presults %>% 
+  group_by(smeti) %>%
+  dplyr::summarise(smeti.num = length(smeti))
+
+# spojim s dfXXX
+dfXXX <- left_join(dfXXX, sumOblubenost, by=c("name"="oblubenost"))
+dfXXX <- left_join(dfXXX, sumVybava, by=c("name"="vybava"))
+dfXXX <- left_join(dfXXX, sumBufet, by=c("name"="bufet"))
+dfXXX <- left_join(dfXXX, sumTeplota, by=c("name"="teplota"))
+dfXXX <- left_join(dfXXX, sumSmeti, by=c("name"="smeti"))
+
+dfXXX[is.na(dfXXX)] <- 0
+
+# doplnim
+shpTajchy <- merge(shpTajchy, dfXXX, by='name')
+
+# zas zmenim na dt
+dtTajchy <- data.table::setDT(as.data.frame(shpTajchy))
+
 
 # 
 infoObsah <- c("Názov tajchu" = "name", # 1
@@ -159,18 +202,18 @@ infoObsah <- c("Názov tajchu" = "name", # 1
   "Názvy tajchov" = "empty", #28
   "Hlavný účel" = "hlavnyUcel", #29
   "Vedľajší účel" = "vedlUcel", #30
-  "Najobľúbenejší tajch" = "oblubenostNum", #31
-  "Najlepšie vybavenie" = "vybavaNum", #32
-  "Najlepší bufet"="bufetNum",#33
-  "Najteplejšia voda"="teplotaNum",#34
-  "Znečistené okolie"="smetiNum" #35
+  "Najobľúbenejší tajch" = "oblubenost.num", #31
+  "Najlepšie vybavenie" = "vybava.num", #32
+  "Najlepší bufet"="bufet.num",#33
+  "Najteplejšia voda"="teplota.num",#34
+  "Znečistené okolie"="smeti.num" #35
 ) 
 
 
 infoList <- list("infoHist" = infoObsah[c(28,2,3,6,7, 29, 30)],
   "infoTech" = infoObsah[c(12,14,13,8,11,17,20,10,15,4,5)],
   "infoDnes" = infoObsah[c(26,16,27,25,23,22,9)],
-  "nazory" = infoObsah[c(31:35)])
+  "xxx" = infoObsah[c(31:35)])
 # } 
 
 

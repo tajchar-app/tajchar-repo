@@ -201,9 +201,8 @@ sidebar <- dashboardSidebar(
           # "Štôlne" = "shpStolne",
           # "Vodné štôlne" = "shpStolneVodne",
           # "Pingy" = "shpPingy",
-          "Historical tajchs" = "shpTajchyHist"
-        ),
-        # "Plánované piargske tajchy"="shpTajchyIdea"),
+          "Historical tajchs" = "shpTajchyHist",
+        "Plánované piargske tajchy"="shpTajchyIdea"),
         selected = ""
       ),
       
@@ -302,7 +301,7 @@ body <- dashboardBody(
         
         tags$img(class="znamka", src="znamka.png"),
         tags$div(class = "text2",
-          "R"),
+          "R programming language"),
         
         tags$div(class = "text1", tags$a(href="https://www.r-project.org/about.html", 
           "Programming language R"), "is open source and its main difference of other languages is that",tags$b(" it´s primarily focused an data analytics, statistics, data mining, data science, and data visualization."), "There is a huge amount of", tags$b("packages,"), "which are immediately accessible to solve many different problems."),
@@ -470,7 +469,7 @@ body <- dashboardBody(
     tabItem(tabName = "zapojsa",
       
       box(width=12,
-        title = "ZAPOJ SA!",
+        title = "BE INVOLVED!",
         
         
         # O Tajcharovi ------------------------------------------------------------
@@ -481,7 +480,7 @@ body <- dashboardBody(
           "Help improve this app. Share your", tags$b("FAVORITE RESERVOIR, the BEST BEACH or BUFFET"), "with others", " Fill out the questionnaire and become a co-author of the thematic maps in the ", tags$b("Opinion Maps category.")),
         
         tags$img(class="znamka", src="dotaznik.png"),
-        tags$div(class = "text3",
+        tags$div(class = "text2",
           "DOTAZNÍK"),
         
         
